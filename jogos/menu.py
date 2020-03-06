@@ -9,5 +9,7 @@ if escolha == 1:
     adivinhacao.jogar()
 elif escolha == 2:
     forca.jogar()
+
 else:
     print('Opção Inválida')
+

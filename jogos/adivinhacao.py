@@ -14,7 +14,7 @@ def jogar():
         'O valor do seu chute será subtraído da sua pontuação\n'
         'Caso sua pontuação atinga Zero, o jogo terminará')
     print('-' * 50)
-    pontos = 1000
+    #pontos = 1000
     numero_secreto = 42
     tentativas = 3
     rodada = 1
