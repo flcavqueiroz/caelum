@@ -1,35 +1,46 @@
-def cria_conta(titular, numero, saldo, limite):
-    conta = {'titular': titular, 'numero': numero, 'saldo': saldo, 'limite': limite}
-    return conta
-    
-def saca(conta, valor):
-    conta['saldo'] -= float(valor)
+import datetime
+class Conta:
+    def __init__(self, titular, numero, saldo, limite):
+        print('Criando uma nova conta')
+        self.titular = titular
+        self.numero = numero
+        self.saldo = saldo
+        self.limite = limite
+        self.historico = Historico()
 
-def deposita(conta, valor):
-    conta['saldo'] += float(valor)
+    def saca(self, valor):
+        if self.saldo < valor:
+            return False
+        else:
+            self.saldo -= valor
+            self.historico.transacoes.append(f'saque de {valor}')
 
-def extrato(conta):
-    print(f'numero: {conta["numero"]} \nsaldo: {conta["saldo"]}')
+    def deposita(self, valor):
+        self.saldo += valor
+        self.historico.transacoes.append(f'depósito de {valor}')
 
 
-if __name__ == '__main__':
-    conta1 = cria_conta('João', '123-4', 12000.0, 100.00)
-    conta2 = cria_conta('Maria', '123-5', 15000.0, 100.00)
+    def transfere_para(self, destino, valor):
+        retira = self.saca(valor)
+        if retira == False:
+            return False
+        else:
+            destino.deposita(valor)
+            self.historico.transacoes.append(f'transferencia de {valor} para {destino}')
+            return True
+            
 
-    saca(conta1, 100.00)
-    saca(conta2, 500.00)
-    
-    print(conta1['saldo'])
-    print(conta2['saldo'])
-    
-    deposita(conta1, 20.00)
-    deposita(conta2, 50.00)
+    def extrato(self):
+        print(f'numero: {self.numero}\nsaldo: {self.saldo}')
 
-    print(conta1['saldo'])
-    print(conta2['saldo'])
+class Historico:
 
-    extrato(conta1)
-    extrato(conta2)
+    def __init__(self):
+        self.data_abertura = datetime.datetime.today()
+        self.transacoes = []
 
-    print(conta1['saldo'])
-    print(conta2['saldo'])
+    def imprime(self):
+        print(f'data abertura: {self.data_abertura}')
+        print('transações: ')
+        for t in self.transacoes:
+            print('-', t)
