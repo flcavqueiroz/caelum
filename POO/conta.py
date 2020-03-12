@@ -1,8 +1,10 @@
 import datetime
 import csv
 import cliente
+import abc
 
-class Conta:
+
+class Conta(abc.ABC):
     """
     Cria uma conta passando quatro atributos:
         x = Conta(a, b, c, d)
@@ -103,6 +105,15 @@ class Conta:
         """
         print(f'numero: {self.numero}\nsaldo: {self.saldo}')
 
+    @abc.abstractmethod
+    def atualiza(self, taxa):
+        self._saldo += self._saldo * taxa
+
+
+    def __str__(self):
+        return f'Titular: {self._titular} - Número: {self._numero} - Saldo: {self._saldo}'
+
+
 class Historico:
 
     def __init__(self):
@@ -121,4 +132,56 @@ class Historico:
         for t in self.transacoes:
             print('-', t)
 
+        
 
+
+class ContaCorrente(Conta):
+
+    
+    def atualiza(self, taxa):
+        self._saldo += self._saldo * taxa * 2
+
+
+    def deposita(self, valor):
+        self._saldo += valor - 0.1
+
+
+
+class ContaPoupanca(Conta):
+
+
+    def atualiza(self, taxa):
+        self._saldo += self._saldo * taxa * 3
+
+
+class ContaInvestimento(Conta):
+    
+    
+    def atualiza(self, taxa):
+        self._saldo += self._saldo * taxa * 5
+
+
+if __name__ == '__main__':
+    #c = Conta('Fernando', '123-4', 1000.0)
+    cc = ContaCorrente('Elisa', '123-5', 1000.0)
+    cp = ContaPoupanca('Joao', '123-6', 1000.0)
+    ci = ContaInvestimento('Elisa Maria', '123-7', 10000.0)
+
+    #c.atualiza(0.01)
+    cc.atualiza(0.01)
+    cp.atualiza(0.01)
+    ci.deposita(1000.0)
+    ci.atualiza(0.01)
+
+
+
+
+    #print(c.saldo)
+    print(cc.saldo)
+    print(cp.saldo)
+    print(ci.saldo)
+
+    #print(c)
+    print(cc)
+    print(cp)
+    print(ci)
