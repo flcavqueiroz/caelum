@@ -2,9 +2,11 @@ import datetime
 import csv
 import cliente
 import abc
+import tributavel
+from error import SaldoInsuficienteError
 
 
-class Conta(abc.ABC):
+class Conta:
     """
     Cria uma conta passando quatro atributos:
         x = Conta(a, b, c, d)
@@ -105,7 +107,8 @@ class Conta(abc.ABC):
         """
         print(f'numero: {self.numero}\nsaldo: {self.saldo}')
 
-    @abc.abstractmethod
+    #@abc.abstractmethod 
+    #define que o mesmo método tem de ser exposto abaixo pra cada classe
     def atualiza(self, taxa):
         self._saldo += self._saldo * taxa
 
@@ -135,19 +138,41 @@ class Historico:
         
 
 
-class ContaCorrente(Conta):
+class ContaCorrente(Conta, tributavel.TributavelMixIn):
 
     
     def atualiza(self, taxa):
         self._saldo += self._saldo * taxa * 2
 
+    
+    def saca(self, valor):
+        if valor < 0:
+            raise ValueError('Você tentou sacar um valor negativo.')
+        elif self._saldo < valor:
+            raise SaldoInsuficienteError('Saldo insuficiente.')
+        else:
+            self._saldo -= valor
+
 
     def deposita(self, valor):
-        self._saldo += valor - 0.1
+        if valor < 0:
+            raise ValueError('Você tentou depositar um valor negativo.')
+       
+        else:
+            self._saldo += valor - 0.1
 
+
+    def get_valor_imposto(self):
+        return self._saldo * 0.1
 
 
 class ContaPoupanca(Conta):
+
+    def deposita(self, valor):
+        if valor < 0:
+            raise ValueError('Você tentou depositar um valor negativo')
+        else:
+            self._saldo += valor
 
 
     def atualiza(self, taxa):
@@ -161,27 +186,48 @@ class ContaInvestimento(Conta):
         self._saldo += self._saldo * taxa * 5
 
 
+class SeguroDeVida(tributavel.TributavelMixIn):
+    
+    def __init__(self, valor, titular, numero_apolice):
+        self._valor = valor
+        self._titular = titular
+        self._numero_apolice = numero_apolice
+
+    def get_valor_imposto(self):
+        return 50 + self._valor * 0.05
+
+
+
 if __name__ == '__main__':
-    #c = Conta('Fernando', '123-4', 1000.0)
+    c = Conta('Fernando', '123-4', 1000.0)
     cc = ContaCorrente('Elisa', '123-5', 1000.0)
     cp = ContaPoupanca('Joao', '123-6', 1000.0)
     ci = ContaInvestimento('Elisa Maria', '123-7', 10000.0)
 
-    #c.atualiza(0.01)
+    c.atualiza(0.01)
     cc.atualiza(0.01)
     cp.atualiza(0.01)
     ci.deposita(1000.0)
     ci.atualiza(0.01)
 
+    valor = -10
+    try:
+        cc.saca(valor)
+        print(f'Saque de {valor} realizado com sucesso.')
+    except ValueError:
+        print('O valor a ser sacado precisa ser positivo.')
+    except SaldoInsuficienteError:
+        print('Você não possui saldo suficiente.')
+    cc.deposita(valor)
 
 
 
-    #print(c.saldo)
-    print(cc.saldo)
-    print(cp.saldo)
-    print(ci.saldo)
+    # print(c.saldo)
+    # print(cc.saldo)
+    # print(cp.saldo)
+    # print(ci.saldo)
 
-    #print(c)
-    print(cc)
-    print(cp)
-    print(ci)
+    # print(c)
+    # print(cc)
+    # print(cp)
+    # print(ci)
